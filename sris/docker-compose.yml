@@ -1,0 +1,45 @@
+# Levanta el SRIS + su propia base de datos MySQL con un solo comando:
+#   docker compose up --build
+#
+# La DB se publica en el puerto 3307 del host para NO chocar con el MySQL
+# del proyecto api-rest (que usa el 3306).
+services:
+  db:
+    image: mysql:8.0
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: sris
+    ports:
+      - '3307:3306'
+    volumes:
+      - sris_db_data:/var/lib/mysql
+    healthcheck:
+      test: ['CMD', 'mysqladmin', 'ping', '-h', 'localhost', '-proot']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  api:
+    build: .
+    restart: unless-stopped
+    ports:
+      - '4000:4000'
+    environment:
+      NODE_ENV: production
+      PORT: 4000
+      JWT_SECRET: cambia-esta-clave-super-secreta-en-produccion
+      JWT_EXPIRES_IN: 2h
+      BCRYPT_ROUNDS: 10
+      SEED_ON_START: 'true'
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_USER: root
+      DB_PASSWORD: root
+      DB_NAME: sris
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  sris_db_data:
