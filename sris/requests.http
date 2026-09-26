@@ -1,0 +1,64 @@
+### SRIS — colección de peticiones (VS Code REST Client / IntelliJ HTTP)
+@base = http://localhost:4000
+@api = {{base}}/api/v1
+
+### Health
+GET {{base}}/health
+
+### Login AUDITOR (guarda el token en la variable)
+# @name loginAuditor
+POST {{api}}/auth/login
+Content-Type: application/json
+
+{ "email": "auditor@sris.local", "password": "Auditor123!" }
+
+### Login ADMINISTRADOR
+# @name loginAdmin
+POST {{api}}/auth/login
+Content-Type: application/json
+
+{ "email": "admin@sris.local", "password": "Admin123!" }
+
+@tokenAuditor = {{loginAuditor.response.body.data.token}}
+@tokenAdmin = {{loginAdmin.response.body.data.token}}
+
+### Crear incidente (auditor) -> 201
+POST {{api}}/incidentes
+Authorization: Bearer {{tokenAuditor}}
+Content-Type: application/json
+
+{
+  "titulo": "Puerto SSH expuesto a internet",
+  "descripcion": "El servidor de staging tiene el puerto 22 abierto sin restricción de IP.",
+  "tipo": "vulnerabilidad",
+  "severidad": "alta",
+  "sistema_afectado": "infra-staging",
+  "fecha_deteccion": "2026-09-26T14:00:00Z",
+  "observaciones": "Detectado en escaneo nmap."
+}
+
+### Listar incidentes con filtros y paginación
+GET {{api}}/incidentes?estado=abierto&severidad=critica&page=1&limit=10
+Authorization: Bearer {{tokenAuditor}}
+
+### Detalle de un incidente
+GET {{api}}/incidentes/1
+Authorization: Bearer {{tokenAuditor}}
+
+### PATCH estado (SOLO admin) -> 200
+PATCH {{api}}/incidentes/1/estado
+Authorization: Bearer {{tokenAdmin}}
+Content-Type: application/json
+
+{ "estado": "en_investigacion", "observaciones": "Asignado al equipo de infra." }
+
+### DELETE borrado lógico (SOLO admin) -> 200
+DELETE {{api}}/incidentes/1
+Authorization: Bearer {{tokenAdmin}}
+
+### Sin token -> 401
+GET {{api}}/incidentes
+
+### Auditor intenta borrar -> 403
+DELETE {{api}}/incidentes/2
+Authorization: Bearer {{tokenAuditor}}
