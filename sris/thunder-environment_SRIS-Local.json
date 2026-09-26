@@ -1,0 +1,10 @@
+{
+  "client": "Thunder Client",
+  "environmentName": "SRIS Local",
+  "dateExported": "2026-09-26T18:00:00.000Z",
+  "version": "1.2",
+  "data": [
+    { "name": "baseUrl", "value": "http://localhost:4000" },
+    { "name": "token", "value": "" }
+  ]
+}

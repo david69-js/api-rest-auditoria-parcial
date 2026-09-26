@@ -1,0 +1,146 @@
+{
+  "client": "Thunder Client",
+  "collectionName": "SRIS · Incidentes",
+  "dateExported": "2026-09-26T18:00:00.000Z",
+  "version": "1.2",
+  "folders": [
+    { "_id": "sris-fld-auth", "name": "Auth", "containerId": "", "created": "2026-09-26T18:00:00.000Z", "sortNum": 10000 },
+    { "_id": "sris-fld-inc", "name": "Incidentes", "containerId": "", "created": "2026-09-26T18:00:00.000Z", "sortNum": 20000 }
+  ],
+  "requests": [
+    {
+      "_id": "sris-req-login-admin",
+      "colId": "col-sris",
+      "containerId": "sris-fld-auth",
+      "name": "Login administrador",
+      "url": "http://localhost:4000/api/v1/auth/login",
+      "method": "POST",
+      "sortNum": 10000,
+      "created": "2026-09-26T18:00:00.000Z",
+      "modified": "2026-09-26T18:00:00.000Z",
+      "headers": [{ "name": "Content-Type", "value": "application/json" }],
+      "params": [],
+      "body": {
+        "type": "json",
+        "raw": "{\n  \"email\": \"admin@sris.local\",\n  \"password\": \"Admin123!\"\n}",
+        "form": []
+      },
+      "tests": [
+        { "type": "set-env-var", "custom": "json.data.token", "action": "setto", "value": "token" }
+      ]
+    },
+    {
+      "_id": "sris-req-login-auditor",
+      "colId": "col-sris",
+      "containerId": "sris-fld-auth",
+      "name": "Login auditor",
+      "url": "http://localhost:4000/api/v1/auth/login",
+      "method": "POST",
+      "sortNum": 20000,
+      "created": "2026-09-26T18:00:00.000Z",
+      "modified": "2026-09-26T18:00:00.000Z",
+      "headers": [{ "name": "Content-Type", "value": "application/json" }],
+      "params": [],
+      "body": {
+        "type": "json",
+        "raw": "{\n  \"email\": \"auditor@sris.local\",\n  \"password\": \"Auditor123!\"\n}",
+        "form": []
+      },
+      "tests": [
+        { "type": "set-env-var", "custom": "json.data.token", "action": "setto", "value": "token" }
+      ]
+    },
+    {
+      "_id": "sris-req-crear",
+      "colId": "col-sris",
+      "containerId": "sris-fld-inc",
+      "name": "Crear incidente",
+      "url": "http://localhost:4000/api/v1/incidentes",
+      "method": "POST",
+      "sortNum": 30000,
+      "created": "2026-09-26T18:00:00.000Z",
+      "modified": "2026-09-26T18:00:00.000Z",
+      "headers": [
+        { "name": "Content-Type", "value": "application/json" },
+        { "name": "Authorization", "value": "Bearer {{token}}" }
+      ],
+      "params": [],
+      "body": {
+        "type": "json",
+        "raw": "{\n  \"titulo\": \"Puerto SSH expuesto a internet\",\n  \"descripcion\": \"El servidor de staging tiene el puerto 22 abierto sin restriccion de IP.\",\n  \"tipo\": \"vulnerabilidad\",\n  \"severidad\": \"alta\",\n  \"sistema_afectado\": \"infra-staging\",\n  \"fecha_deteccion\": \"2026-09-26T14:00:00Z\",\n  \"observaciones\": \"Detectado en escaneo nmap.\"\n}",
+        "form": []
+      },
+      "tests": []
+    },
+    {
+      "_id": "sris-req-listar",
+      "colId": "col-sris",
+      "containerId": "sris-fld-inc",
+      "name": "Listar incidentes (filtros + paginacion)",
+      "url": "http://localhost:4000/api/v1/incidentes?page=1&limit=10",
+      "method": "GET",
+      "sortNum": 40000,
+      "created": "2026-09-26T18:00:00.000Z",
+      "modified": "2026-09-26T18:00:00.000Z",
+      "headers": [{ "name": "Authorization", "value": "Bearer {{token}}" }],
+      "params": [
+        { "name": "page", "value": "1", "isPath": false },
+        { "name": "limit", "value": "10", "isPath": false },
+        { "name": "estado", "value": "abierto", "isPath": false, "isDisabled": true },
+        { "name": "severidad", "value": "critica", "isPath": false, "isDisabled": true }
+      ],
+      "tests": []
+    },
+    {
+      "_id": "sris-req-detalle",
+      "colId": "col-sris",
+      "containerId": "sris-fld-inc",
+      "name": "Detalle incidente",
+      "url": "http://localhost:4000/api/v1/incidentes/1",
+      "method": "GET",
+      "sortNum": 50000,
+      "created": "2026-09-26T18:00:00.000Z",
+      "modified": "2026-09-26T18:00:00.000Z",
+      "headers": [{ "name": "Authorization", "value": "Bearer {{token}}" }],
+      "params": [],
+      "tests": []
+    },
+    {
+      "_id": "sris-req-patch",
+      "colId": "col-sris",
+      "containerId": "sris-fld-inc",
+      "name": "Actualizar estado (solo admin)",
+      "url": "http://localhost:4000/api/v1/incidentes/1/estado",
+      "method": "PATCH",
+      "sortNum": 60000,
+      "created": "2026-09-26T18:00:00.000Z",
+      "modified": "2026-09-26T18:00:00.000Z",
+      "headers": [
+        { "name": "Content-Type", "value": "application/json" },
+        { "name": "Authorization", "value": "Bearer {{token}}" }
+      ],
+      "params": [],
+      "body": {
+        "type": "json",
+        "raw": "{\n  \"estado\": \"en_investigacion\",\n  \"observaciones\": \"Asignado al equipo de infra.\"\n}",
+        "form": []
+      },
+      "tests": []
+    },
+    {
+      "_id": "sris-req-delete",
+      "colId": "col-sris",
+      "containerId": "sris-fld-inc",
+      "name": "Eliminar incidente (solo admin)",
+      "url": "http://localhost:4000/api/v1/incidentes/1",
+      "method": "DELETE",
+      "sortNum": 70000,
+      "created": "2026-09-26T18:00:00.000Z",
+      "modified": "2026-09-26T18:00:00.000Z",
+      "headers": [{ "name": "Authorization", "value": "Bearer {{token}}" }],
+      "params": [],
+      "tests": []
+    }
+  ],
+  "settings": {}
+}
